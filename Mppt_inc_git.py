@@ -304,3 +304,4 @@ for i in range(1, len(time)):    # 실제 시뮬레이션 time for문   *0초는
 
 # plt.ioff()
 plt.show()
+print('end')
