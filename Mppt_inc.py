@@ -272,25 +272,36 @@ for i in range(1, len(time)):    # 실제 시뮬레이션 time for문   *0초는
   P_old = P_arr[i - 1]      # 현재 전력
 
   # =============================================================
-  # sp = PvPanal(irradiance, temperature, V_pv, I_pv, P_pv)           # irradiance, temperature, V_pv, I_pv, P_pv
-  # V_pv = sp.PvVoltage()      # 현재 전압
-  # I_pv = sp.PvCurrent()      # 현재 전류
-  # P_pv = sp.PvPower()        # 현재 전력
+# for i in range(len(time)):    # 실제 시뮬레이션 time for문   *0초는 제외!
+
+#   # 시간 변화에 따른 일사량
+#   if (0 <= time[i] and time[i] < 3):
+#     irradiance = 1000
+#   elif (3 <= time[i] and time[i] < 6):
+#     irradiance = 500
+#   else : 
+#     irradiance = 1000
+
+
+#   sp = PvPanal(irradiance, temperature, V_pv, I_pv, P_pv)           # irradiance, temperature, V_pv, I_pv, P_pv
+#   V_pv = sp.PvVoltage()      # 현재 전압
+#   I_pv = sp.PvCurrent()      # 현재 전류
+#   P_pv = sp.PvPower()        # 현재 전력
   
-  # V_arr[i] = V_pv
-  # I_arr[i] = I_pv
-  # P_arr[i] = P_pv
+#   V_arr[i] = V_pv
+#   I_arr[i] = I_pv
+#   P_arr[i] = P_pv
 
-  # Mppt = INC(V_pv, I_pv, P_pv, V_old, I_old, P_old, V_ref, Step_size)        # V_pv, I_pv, P_pv, V_old, I_old, P_old, V_ref, Step_size
-  # V_ref = Mppt.Vref()
-  # # print('INC code:', Mppt.code)                             # INC알고리즘 동작 확인 코드 
+#   Mppt = INC(V_pv, I_pv, P_pv, V_old, I_old, P_old, V_ref, Step_size)        # V_pv, I_pv, P_pv, V_old, I_old, P_old, V_ref, Step_size
+#   V_ref = Mppt.Vref()
+#   # print('INC code:', Mppt.code)                             # INC알고리즘 동작 확인 코드 
   
 
-  # V_old = V_pv      # 현재 전압       
-  # I_old = I_pv      # 현재 전류
-  # P_old = P_pv      # 현재 전력
+#   V_old = V_pv      # 현재 전압       
+#   I_old = I_pv      # 현재 전류
+#   P_old = P_pv      # 현재 전력
 
-  # V_pv = V_ref
+#   V_pv = V_ref
   # =============================================================
 
   line_vp.set_data(V_arr[:i+1], P_arr[:i+1])        # 전압-전력
