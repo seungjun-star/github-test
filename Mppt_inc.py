@@ -234,45 +234,17 @@ axes[4].set_ylim(20, V_oc + 2)
 
 fig.suptitle(f"INC MPPT Real-Time Tracking  (dt={time_step}s, step={Step_size}V)", fontsize=14)
 plt.tight_layout()
+# =============================================================
+# ----------------
+# 오류코드
+# ----------------
+# V_old = V_arr[0] 
+# I_old = I_arr[0] 
+# P_old = P_arr[0] 
 
 
-V_old = V_arr[0] 
-I_old = I_arr[0] 
-P_old = P_arr[0] 
-
-
-for i in range(1, len(time)):    # 실제 시뮬레이션 time for문   *0초는 제외!
-# for i in range(0, 10, 1):        # 테스트 용 for문
-
-  # 시간 변화에 따른 일사량
-  if (0 <= time[i] and time[i] < 3):
-    irradiance = 1000
-  elif (3 <= time[i] and time[i] < 6):
-    irradiance = 500
-  else : 
-    irradiance = 1000
-
-  V_arr[i] = V_pv
-  I_arr[i] = I_pv
-  P_arr[i] = P_pv
-
-  sp = PvPanal(irradiance, temperature, V_pv, I_pv, P_pv)           # irradiance, temperature, V_pv, I_pv, P_pv
-  V_pv = sp.PvVoltage()      # 현재 전압
-  I_pv = sp.PvCurrent()      # 현재 전류
-  P_pv = sp.PvPower()        # 현재 전력
-
-  Mppt = INC(V_pv, I_pv, P_pv, V_old, I_old, P_old, V_ref, Step_size)        # V_pv, I_pv, P_pv, V_old, I_old, P_old, V_ref, Step_size
-  V_ref = Mppt.Vref()
-  V_pv = V_ref
-  # print('INC code:', Mppt.code)                             # INC알고리즘 동작 확인 코드 
-  
-
-  V_old = V_arr[i - 1]      # 현재 전압       * i = 0일 경우  배열의 마지막 값이 들어가므로 주의
-  I_old = I_arr[i - 1]      # 현재 전류
-  P_old = P_arr[i - 1]      # 현재 전력
-
-  # =============================================================
-# for i in range(len(time)):    # 실제 시뮬레이션 time for문   *0초는 제외!
+# for i in range(1, len(time)):    # 실제 시뮬레이션 time for문   *0초는 제외!
+# # for i in range(0, 10, 1):        # 테스트 용 for문
 
 #   # 시간 변화에 따른 일사량
 #   if (0 <= time[i] and time[i] < 3):
@@ -282,27 +254,60 @@ for i in range(1, len(time)):    # 실제 시뮬레이션 time for문   *0초는
 #   else : 
 #     irradiance = 1000
 
+#   V_arr[i] = V_pv
+#   I_arr[i] = I_pv
+#   P_arr[i] = P_pv
 
 #   sp = PvPanal(irradiance, temperature, V_pv, I_pv, P_pv)           # irradiance, temperature, V_pv, I_pv, P_pv
 #   V_pv = sp.PvVoltage()      # 현재 전압
 #   I_pv = sp.PvCurrent()      # 현재 전류
 #   P_pv = sp.PvPower()        # 현재 전력
-  
-#   V_arr[i] = V_pv
-#   I_arr[i] = I_pv
-#   P_arr[i] = P_pv
 
 #   Mppt = INC(V_pv, I_pv, P_pv, V_old, I_old, P_old, V_ref, Step_size)        # V_pv, I_pv, P_pv, V_old, I_old, P_old, V_ref, Step_size
 #   V_ref = Mppt.Vref()
+#   V_pv = V_ref
 #   # print('INC code:', Mppt.code)                             # INC알고리즘 동작 확인 코드 
   
 
-#   V_old = V_pv      # 현재 전압       
-#   I_old = I_pv      # 현재 전류
-#   P_old = P_pv      # 현재 전력
+#   V_old = V_arr[i - 1]      # 현재 전압       * i = 0일 경우  배열의 마지막 값이 들어가므로 주의
+#   I_old = I_arr[i - 1]      # 현재 전류
+#   P_old = P_arr[i - 1]      # 현재 전력
+# 
+# =============================================================
+# ----------------
+# 정상코드
+# ----------------
+for i in range(len(time)):    # 실제 시뮬레이션 time for문   *0초는 제외!
 
-#   V_pv = V_ref
-  # =============================================================
+  # 시간 변화에 따른 일사량
+  if (0 <= time[i] and time[i] < 3):
+    irradiance = 1000
+  elif (3 <= time[i] and time[i] < 6):
+    irradiance = 500
+  else : 
+    irradiance = 1000
+
+
+  sp = PvPanal(irradiance, temperature, V_pv, I_pv, P_pv)           # irradiance, temperature, V_pv, I_pv, P_pv
+  V_pv = sp.PvVoltage()      # 현재 전압
+  I_pv = sp.PvCurrent()      # 현재 전류
+  P_pv = sp.PvPower()        # 현재 전력
+  
+  V_arr[i] = V_pv
+  I_arr[i] = I_pv
+  P_arr[i] = P_pv
+
+  Mppt = INC(V_pv, I_pv, P_pv, V_old, I_old, P_old, V_ref, Step_size)        # V_pv, I_pv, P_pv, V_old, I_old, P_old, V_ref, Step_size
+  V_ref = Mppt.Vref()
+  # print('INC code:', Mppt.code)                             # INC알고리즘 동작 확인 코드 
+  
+
+  V_old = V_pv      # 현재 전압       
+  I_old = I_pv      # 현재 전류
+  P_old = P_pv      # 현재 전력
+
+  V_pv = V_ref
+# =============================================================
 
   line_vp.set_data(V_arr[:i+1], P_arr[:i+1])        # 전압-전력
   line_vt.set_data(time[:i+1], V_arr[:i+1])         # 시간-전압
