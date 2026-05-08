@@ -1,3 +1,7 @@
+# INC알고리즘을 활용한 MPPT제어 시뮬레이션
+# 2025/04/12/토
+# 배재대학교 전기전자공학과 2146031 정승준
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -21,7 +25,7 @@ I_sc = 8.5              # 단락 전류(A)
 
 # 일사량 변동
 # 00:00.000 ~ 00:02:999 (안정기): 일사량 1000 W/m² 유지 (초기 목표점 도달 및 진동 확인)
-# 00:03.000 ~ 00:05.999 (구름 통과): 일사량 500    로 급락 (갑자기 줄어든 일사량에 대한 추종 속도 확인)
+# 00:03.000 ~ 00:05.999 (구름 통과): 일사량 500 W/m² 로 급락 (갑자기 줄어든 일사량에 대한 추종 속도 확인)
 # 00:06.000 ~ 00:10.000 (다시 맑아짐): 일사량 1000 W/m² 로 급등 (P&O가 방향을 잃고 헤매는지, INC가 안정적으로 쫓아가는지 확인)
 
 
@@ -80,7 +84,7 @@ class PvPanal:
     # 전류 계산
     # I = I_scAct * (1 - self.V_pv / V_ocAct)
    
-    k = 8   # MPP 위치 조정용 지수
+    k = 12   # MPP 위치 조정용 지수
     I = I_scAct * (1 - (self.V_pv / V_ocAct) ** k)
     self.I_pv = max(I, 0)   # 음수 방지
     return self.I_pv  
@@ -183,7 +187,6 @@ class INC:
 # ==== 시뮬레이션 시작 ====
 # =======================
 plt.ion()
-
 fig = plt.figure(figsize=(16,13))
 gs = fig.add_gridspec(4,2)
 
@@ -193,7 +196,6 @@ axes.append(fig.add_subplot(gs[1,:]))
 axes.append(fig.add_subplot(gs[2,:]))
 axes.append(fig.add_subplot(gs[3,0]))
 axes.append(fig.add_subplot(gs[3,1]))
-
 
 line_vp, = axes[0].plot([], [], linewidth=2, label="V-P line")
 axes[0].set_xlabel("PV Voltage")
@@ -236,12 +238,7 @@ fig.suptitle(f"INC MPPT Real-Time Tracking  (dt={time_step}s, step={Step_size}V)
 plt.tight_layout()
 
 
-V_old = V_arr[0] 
-I_old = I_arr[0] 
-P_old = P_arr[0] 
-
-
-for i in range(1, len(time)):    # 실제 시뮬레이션 time for문   *0초는 제외!
+for i in range(len(time)):    # 실제 시뮬레이션 time for문   *0초는 제외!
 # for i in range(0, 10, 1):        # 테스트 용 for문
 
   # 시간 변화에 따른 일사량
@@ -252,25 +249,29 @@ for i in range(1, len(time)):    # 실제 시뮬레이션 time for문   *0초는
   else : 
     irradiance = 1000
 
-  V_arr[i] = V_pv
-  I_arr[i] = I_pv
-  P_arr[i] = P_pv
 
   sp = PvPanal(irradiance, temperature, V_pv, I_pv, P_pv)           # irradiance, temperature, V_pv, I_pv, P_pv
   V_pv = sp.PvVoltage()      # 현재 전압
   I_pv = sp.PvCurrent()      # 현재 전류
   P_pv = sp.PvPower()        # 현재 전력
+  
+  V_arr[i] = V_pv
+  I_arr[i] = I_pv
+  P_arr[i] = P_pv
 
   Mppt = INC(V_pv, I_pv, P_pv, V_old, I_old, P_old, V_ref, Step_size)        # V_pv, I_pv, P_pv, V_old, I_old, P_old, V_ref, Step_size
   V_ref = Mppt.Vref()
-  V_pv = V_ref
   # print('INC code:', Mppt.code)                             # INC알고리즘 동작 확인 코드 
   
 
-  V_old = V_arr[i - 1]      # 현재 전압       * i = 0일 경우  배열의 마지막 값이 들어가므로 주의
-  I_old = I_arr[i - 1]      # 현재 전류
-  P_old = P_arr[i - 1]      # 현재 전력
+  V_old = V_pv      # 현재 전압       
+  I_old = I_pv      # 현재 전류
+  P_old = P_pv      # 현재 전력
 
+  V_pv = V_ref
+
+  
+  
   line_vp.set_data(V_arr[:i+1], P_arr[:i+1])        # 전압-전력
   line_vt.set_data(time[:i+1], V_arr[:i+1])         # 시간-전압
   line_pt.set_data(time[:i+1], P_arr[:i+1])         # 시간-전력
@@ -281,8 +282,8 @@ for i in range(1, len(time)):    # 실제 시뮬레이션 time for문   *0초는
   # 확인용 print() 구문
   # print(f"Time={time[i]:3f} ,G={irradiance}, Vpv={V_pv:.2f},  Vref={V_ref:.2f}, Ipv={I_pv:.2f}, Ppv = {P_pv:.2f}")    
 
-
 # ===================================
+
 # plt 실행
 # 전압-전력 그래프
 # plt.subplot(3,1,1)
